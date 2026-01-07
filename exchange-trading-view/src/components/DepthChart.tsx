@@ -1,31 +1,17 @@
 // src/components/DepthChart.tsx
 import { useEffect, useRef } from 'react'
+import { useAtomValue } from 'jotai'
+import { orderBookAtom } from '../state/marketAtoms'
 import './DepthChart.css'
 
 type DepthPoint = { price: number; amount: number }
 
-const initialBids: DepthPoint[] = [
-  { price: 62850, amount: 12.5 },
-  { price: 62840, amount: 18.3 },
-  { price: 62830, amount: 25.1 },
-  { price: 62820, amount: 32.7 },
-  { price: 62810, amount: 41.2 },
-  { price: 62800, amount: 58.9 }
-]
-
-const initialAsks: DepthPoint[] = [
-  { price: 62860, amount: 15.4 },
-  { price: 62870, amount: 22.1 },
-  { price: 62880, amount: 28.8 },
-  { price: 62890, amount: 35.6 },
-  { price: 62900, amount: 44.3 },
-  { price: 62910, amount: 62.1 }
-]
-
 export default function DepthChart() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const bidsRef = useRef<DepthPoint[]>(initialBids)
-  const asksRef = useRef<DepthPoint[]>(initialAsks)
+  const bidsRef = useRef<DepthPoint[]>([])
+  const asksRef = useRef<DepthPoint[]>([])
+  const drawRef = useRef<() => void>(() => {})
+  const orderBook = useAtomValue(orderBookAtom)
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -138,27 +124,21 @@ export default function DepthChart() {
       ctx.fillText(`$${midPrice}`, midX, priceY - 8)
     }
 
+    drawRef.current = drawChart
     const resizeObserver = new ResizeObserver(() => drawChart())
     resizeObserver.observe(canvas)
     drawChart()
 
-    const timer = setInterval(() => {
-      bidsRef.current = bidsRef.current.map(point => ({
-        ...point,
-        amount: Math.max(0.5, point.amount + (Math.random() - 0.5) * 5)
-      }))
-      asksRef.current = asksRef.current.map(point => ({
-        ...point,
-        amount: Math.max(0.5, point.amount + (Math.random() - 0.5) * 5)
-      }))
-      drawChart()
-    }, 3500)
-
     return () => {
       resizeObserver.disconnect()
-      clearInterval(timer)
     }
   }, [])
+
+  useEffect(() => {
+    bidsRef.current = orderBook.bids
+    asksRef.current = orderBook.asks
+    drawRef.current()
+  }, [orderBook])
 
   return (
     <div className="panel">

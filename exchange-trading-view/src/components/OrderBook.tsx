@@ -1,20 +1,28 @@
-// OrderBook.tsx
+import { useAtomValue } from 'jotai'
+import { orderBookAtom } from '../state/marketAtoms'
+
 export default function OrderBook() {
+  const orderBook = useAtomValue(orderBookAtom)
+  const bids = [...orderBook.bids].reverse()
+  const asks = orderBook.asks
+
   return (
     <div className="panel">
       <h3>订单簿</h3>
       <div className="book">
-        {[...Array(10)].map((_, i) => (
-          <div key={i} className="row">
-            <span className="price sell">62,{820 + i * 10}.00</span>
-            <span className="amount">1.28{i}</span>
+        {asks.map(level => (
+          <div key={`ask-${level.price}`} className="row">
+            <span className="price sell">{level.price.toFixed(2)}</span>
+            <span className="amount">{level.amount.toFixed(3)}</span>
           </div>
         ))}
-        <div className="current">62,850.00</div>
-        {[...Array(10)].map((_, i) => (
-          <div key={i} className="row">
-            <span className="price buy">62,8{10 - i * 10}.00</span>
-            <span className="amount">2.3{i}</span>
+        <div className="current">
+          {orderBook.lastPrice ? orderBook.lastPrice.toFixed(2) : '--'}
+        </div>
+        {bids.map(level => (
+          <div key={`bid-${level.price}`} className="row">
+            <span className="price buy">{level.price.toFixed(2)}</span>
+            <span className="amount">{level.amount.toFixed(3)}</span>
           </div>
         ))}
       </div>

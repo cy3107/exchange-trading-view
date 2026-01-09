@@ -8,9 +8,11 @@ import {
 } from 'wagmi'
 import { arbitrum, bsc, mainnet } from 'wagmi/chains'
 
+// Shorten an address for display.
 const formatAddress = (address: string) =>
   `${address.slice(0, 6)}...${address.slice(-4)}`
 
+// Human-readable chain labels.
 const chainName = (chainId?: number) => {
   if (!chainId) return 'Unknown'
   if (chainId === mainnet.id) return 'Ethereum'
@@ -19,6 +21,7 @@ const chainName = (chainId?: number) => {
   return `Chain ${chainId}`
 }
 
+// Inline wallet actions with MetaMask-first connector.
 export default function WalletButton() {
   const { address, isConnected } = useAccount()
   const { connect, connectors, isPending } = useConnect()
@@ -26,6 +29,7 @@ export default function WalletButton() {
   const chainId = useChainId()
   const { switchChain } = useSwitchChain()
 
+  // Prefer MetaMask when available.
   const preferred = useMemo(() => {
     return (
       connectors.find(connector => connector.id === 'metaMask') ||
@@ -34,11 +38,13 @@ export default function WalletButton() {
     )
   }, [connectors])
 
+  // Start wallet connection flow.
   const handleConnect = () => {
     if (!preferred) return
     connect({ connector: preferred })
   }
 
+  // Toggle between mainnet and arbitrum for demo.
   const handleSwitch = () => {
     if (!switchChain) return
     const next =

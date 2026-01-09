@@ -1,5 +1,6 @@
 import type { KLineData } from 'klinecharts'
 
+// Generate mock candle history for initial chart state.
 export function generateMockData(count: number): KLineData[] {
   const data: KLineData[] = []
   let timestamp = Date.now() - count * 60 * 1000

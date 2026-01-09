@@ -6,6 +6,7 @@ import './DepthChart.css'
 
 type DepthPoint = { price: number; amount: number }
 
+// Canvas-based market depth chart.
 export default function DepthChart() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const bidsRef = useRef<DepthPoint[]>([])
@@ -19,6 +20,7 @@ export default function DepthChart() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    // Convert raw levels into cumulative depth for area chart.
     const accumulate = (points: DepthPoint[]) => {
       let total = 0
       return points.map(point => {
@@ -28,6 +30,7 @@ export default function DepthChart() {
       })
     }
 
+    // Main drawing routine.
     const drawChart = () => {
       const width = canvas.clientWidth || canvas.width
       const height = canvas.clientHeight || canvas.height
@@ -56,6 +59,7 @@ export default function DepthChart() {
         return height - padding - ((price - minPrice) / priceRange) * chartHeight
       }
 
+      // Render bid/ask depth areas.
       const drawDepthArea = (
         data: ReturnType<typeof accumulate>,
         side: 'bid' | 'ask',
@@ -85,7 +89,7 @@ export default function DepthChart() {
         ctx.stroke()
       }
 
-      // axes
+      // Axes.
       ctx.strokeStyle = '#333'
       ctx.lineWidth = 1
       ctx.beginPath()
@@ -107,7 +111,7 @@ export default function DepthChart() {
         fill: 'rgba(239, 83, 80, 0.25)'
       })
 
-      // current price guide
+      // Current price guide.
       const midPrice = ((maxPrice + minPrice) / 2).toFixed(2)
       const priceY = priceToY((maxPrice + minPrice) / 2)
       ctx.strokeStyle = '#00d4aa'
@@ -135,6 +139,7 @@ export default function DepthChart() {
   }, [])
 
   useEffect(() => {
+    // Sync latest levels and redraw.
     bidsRef.current = orderBook.bids
     asksRef.current = orderBook.asks
     drawRef.current()

@@ -16,8 +16,10 @@ export default function KlineChart({ mode }: Props) {
   const tick = useAtomValue(tickAtom)
   const connection = useAtomValue(connectionAtom)
 
+  // Different cadence for spot vs perpetual demo.
   const interval = mode === 'spot' ? 1000 : 2000
 
+  // Seed a baseline candle series.
   const seedCandles = (count: number) => {
     const data: KLineData[] = []
     let timestamp = Date.now() - count * interval
@@ -61,9 +63,11 @@ export default function KlineChart({ mode }: Props) {
     const chart = chartInstanceRef.current
     if (!chart || !tick.timestamp) return
 
+    // Align tick to current candle slot.
     const candleStart = Math.floor(tick.timestamp / interval) * interval
     let last = candlesRef.current[candlesRef.current.length - 1]
 
+    // Fill any gaps with flat candles.
     const fillMissingCandles = (from: number, to: number, price: number) => {
       for (let ts = from + interval; ts < to; ts += interval) {
         const filler: KLineData = {
@@ -83,6 +87,7 @@ export default function KlineChart({ mode }: Props) {
       if (last) {
         fillMissingCandles(last.timestamp, candleStart, last.close)
       }
+      // Start a new candle when a new interval begins.
       const candle: KLineData = {
         open: tick.price,
         close: tick.price,
@@ -97,6 +102,7 @@ export default function KlineChart({ mode }: Props) {
       return
     }
 
+    // Update current candle with latest tick.
     last = {
       ...last,
       close: tick.price,
@@ -117,6 +123,7 @@ export default function KlineChart({ mode }: Props) {
     const chart = chartInstanceRef.current
     if (!chart) return
 
+    // Backfill candles after reconnect.
     for (
       let ts = lastCandleAtRef.current + interval;
       ts < now;

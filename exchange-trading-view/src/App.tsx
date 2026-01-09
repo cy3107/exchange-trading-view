@@ -10,15 +10,18 @@ import Positions from './components/Positions'
 import TradeList from './components/TradeList'
 import MarketStats from './components/MarketStats'
 import WalletButton from './components/WalletButton'
+import ContractStats from './components/ContractStats'
 import useMarketFeed from './hooks/useMarketFeed'
 import { connectionAtom } from './state/marketAtoms'
 import './App.css'
 
+// Main trading layout.
 function App() {
   const { address, isConnected } = useAccount()
   const [tab, setTab] = useState<'spot' | 'perpetual'>('perpetual')
   const connection = useAtomValue(connectionAtom)
 
+  // Start mock streaming data.
   useMarketFeed()
 
   return (
@@ -54,6 +57,7 @@ function App() {
           <Positions />
         </div>
         <div className="right">
+          <ContractStats />
           <OrderBook />
           <DepthChart />
           <TradeList />

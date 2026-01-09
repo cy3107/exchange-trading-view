@@ -1,6 +1,7 @@
 import { useAtomValue } from 'jotai'
 import { tradesAtom } from '../state/marketAtoms'
 
+// Recent trade tape panel.
 export default function TradeList() {
   const trades = useAtomValue(tradesAtom)
 

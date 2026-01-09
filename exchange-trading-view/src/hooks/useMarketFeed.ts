@@ -15,6 +15,7 @@ import {
   updatePositionsMark
 } from '../services/marketData'
 
+// Channel names for stream segregation.
 type Channel = 'market' | 'trade' | 'account'
 type Message =
   | {
@@ -24,13 +25,16 @@ type Message =
       payload: unknown
     }
 
+// Baseline price for mock stream.
 const BASE_PRICE = 62850
 
+// Optionally create seq gaps to test snapshot reload.
 const nextSeq = (current: number, allowGap = false) => {
   if (!allowGap) return current + 1
   return current + (Math.random() < 0.08 ? 2 : 1)
 }
 
+// Mock WS stream with seq validation, snapshots, patches, and reconnects.
 export default function useMarketFeed() {
   const setOrderBook = useSetAtom(orderBookAtom)
   const setTrades = useSetAtom(tradesAtom)
@@ -41,12 +45,14 @@ export default function useMarketFeed() {
   const setConnection = useSetAtom(connectionAtom)
   const [, startTransition] = useTransition()
 
+  // Mutable refs for stream state.
   const seqRef = useRef({ market: 0, trade: 0, account: 0 })
   const lastSeqRef = useRef({ market: 0, trade: 0, account: 0 })
   const priceRef = useRef(BASE_PRICE)
   const orderBookRef = useRef(createOrderBookSnapshot(BASE_PRICE))
   const activeRef = useRef(true)
 
+  // Keep positions available for snapshot generation.
   useEffect(() => {
     positionsRef.current = positions
   }, [positions])
@@ -58,6 +64,7 @@ export default function useMarketFeed() {
       status: 'connecting'
     }))
 
+    // Central message handler with seq validation.
     const handleMessage = (message: Message) => {
       const lastSeq = lastSeqRef.current[message.channel]
       if (message.seq !== lastSeq + 1) {
@@ -107,6 +114,7 @@ export default function useMarketFeed() {
       }
     }
 
+    // Emit a full snapshot for the requested channel.
     const emitSnapshot = (channel: Channel) => {
       seqRef.current[channel] = nextSeq(seqRef.current[channel])
       const seq = seqRef.current[channel]
@@ -132,6 +140,7 @@ export default function useMarketFeed() {
       }))
     }
 
+    // Order book patch updates.
     const emitPatch = () => {
       seqRef.current.market = nextSeq(seqRef.current.market, true)
       const seq = seqRef.current.market
@@ -139,6 +148,7 @@ export default function useMarketFeed() {
       handleMessage({ channel: 'market', type: 'patch', seq, payload: book })
     }
 
+    // Tick updates for K-line and mark price.
     const emitTick = () => {
       seqRef.current.market = nextSeq(seqRef.current.market)
       const seq = seqRef.current.market
@@ -152,6 +162,7 @@ export default function useMarketFeed() {
       })
     }
 
+    // Single trade updates.
     const emitTrade = () => {
       seqRef.current.trade = nextSeq(seqRef.current.trade, true)
       const seq = seqRef.current.trade
@@ -164,11 +175,13 @@ export default function useMarketFeed() {
       })
     }
 
+    // Reset seq and re-sync from snapshot.
     const triggerSnapshot = (channel: Channel) => {
       lastSeqRef.current[channel] = 0
       emitSnapshot(channel)
     }
 
+    // Initial snapshot sync for all channels.
     const startStream = () => {
       emitSnapshot('account')
       emitSnapshot('market')
@@ -177,11 +190,13 @@ export default function useMarketFeed() {
       setConnection(prev => ({ ...prev, status: 'connected' }))
     }
 
+    // Simulate streaming intervals.
     let tickTimer = window.setInterval(emitTick, 1000)
     let patchTimer = window.setInterval(emitPatch, 1500)
     let tradeTimer = window.setInterval(emitTrade, 2000)
     let disconnectTimer = 0
 
+    // Simulate disconnect/reconnect cycles.
     const disconnectCycle = () => {
       if (!activeRef.current) return
       window.clearInterval(tickTimer)

@@ -3,6 +3,7 @@ import { useAtomValue, useSetAtom } from 'jotai'
 import { positionsAtom, tickAtom, tradesAtom } from '../state/marketAtoms'
 import { makeTradeFromOrder, upsertPosition } from '../services/marketData'
 
+// Simplified order entry for demo.
 export default function OrderForm() {
   const tick = useAtomValue(tickAtom)
   const setPositions = useSetAtom(positionsAtom)
@@ -14,11 +15,13 @@ export default function OrderForm() {
   const [size, setSize] = useState<number>(0.05)
 
   useEffect(() => {
+    // Keep market order price synced with latest tick.
     if (orderType === 'market' && tick.price) {
       setPrice(tick.price)
     }
   }, [orderType, tick.price])
 
+  // Apply order to position + trade tape.
   const submitOrder = () => {
     const execPrice = orderType === 'market' ? tick.price : price
     if (!execPrice || size <= 0) return

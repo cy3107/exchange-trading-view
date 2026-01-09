@@ -5,15 +5,19 @@ import type {
   Trade
 } from '../state/marketAtoms'
 
+// Demo symbol for all generated data.
 const SYMBOL = 'BTC-PERP'
 
+// Simple ID helper for mock data.
 const makeId = () => `${Date.now()}-${Math.floor(Math.random() * 1e6)}`
 
+// Numeric rounding helper for stable UI.
 const round = (value: number, decimals = 2) => {
   const factor = 10 ** decimals
   return Math.round(value * factor) / factor
 }
 
+// Create a full order book snapshot around a mid price.
 export const createOrderBookSnapshot = (
   midPrice: number,
   depth = 10
@@ -29,6 +33,7 @@ export const createOrderBookSnapshot = (
   }
 }
 
+// Build ladder levels for a side.
 const createLevels = (
   midPrice: number,
   depth: number,
@@ -43,6 +48,7 @@ const createLevels = (
   })
 }
 
+// Apply a patch to the existing book to simulate streaming updates.
 export const applyOrderBookPatch = (
   book: OrderBookState,
   midPrice: number
@@ -65,6 +71,7 @@ export const applyOrderBookPatch = (
   }
 }
 
+// Create a snapshot list of recent trades.
 export const createTradesSnapshot = (
   midPrice: number,
   count = 20
@@ -72,6 +79,7 @@ export const createTradesSnapshot = (
   return Array.from({ length: count }, () => makeTrade(midPrice))
 }
 
+// Create a single mock trade around mid.
 export const makeTrade = (midPrice: number): Trade => {
   const side = Math.random() > 0.5 ? 'buy' : 'sell'
   const drift = (Math.random() - 0.5) * 30
@@ -85,6 +93,7 @@ export const makeTrade = (midPrice: number): Trade => {
   }
 }
 
+// Reprice positions based on mark price.
 export const updatePositionsMark = (
   positions: Position[],
   markPrice: number
@@ -96,6 +105,7 @@ export const updatePositionsMark = (
   }))
 }
 
+// Merge a new order into the position model (single net position).
 export const upsertPosition = (
   positions: Position[],
   order: { side: 'buy' | 'sell'; price: number; size: number }
@@ -159,6 +169,7 @@ export const upsertPosition = (
   return []
 }
 
+// Convert a user order into a trade entry.
 export const makeTradeFromOrder = (order: {
   side: 'buy' | 'sell'
   price: number
@@ -173,6 +184,7 @@ export const makeTradeFromOrder = (order: {
   }
 }
 
+// Compute unrealized pnl for a position.
 const calcPnl = (position: Position, markPrice: number) => {
   const diff =
     position.side === 'long'

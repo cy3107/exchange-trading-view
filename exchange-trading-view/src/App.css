@@ -37,6 +37,11 @@
 .book .row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 12px; font-family: "JetBrains Mono", monospace; }
 .current { text-align: center; font-size: 18px; font-weight: 700; color: #00d4aa; padding: 8px 0; border-top: 1px solid rgba(255, 255, 255, 0.08); border-bottom: 1px solid rgba(255, 255, 255, 0.08); font-family: "JetBrains Mono", monospace; }
 
+.contract-stats .stat-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.contract-stats .stat-item { display: flex; flex-direction: column; gap: 6px; background: rgba(7, 9, 12, 0.7); border: 1px solid rgba(255, 255, 255, 0.06); padding: 10px; border-radius: 10px; }
+.contract-stats .stat-item span { font-size: 11px; color: #8a96a6; }
+.contract-stats .stat-item strong { font-size: 14px; font-family: "JetBrains Mono", monospace; }
+
 .order-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .order-form h3 { grid-column: span 2; }
 .order-row { display: flex; gap: 8px; grid-column: span 2; }

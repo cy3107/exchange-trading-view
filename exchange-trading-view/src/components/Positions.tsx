@@ -1,6 +1,7 @@
 import { useAtomValue } from 'jotai'
 import { positionsAtom } from '../state/marketAtoms'
 
+// Positions panel.
 export default function Positions() {
   const positions = useAtomValue(positionsAtom)
 

@@ -1,6 +1,7 @@
 import { useAtomValue } from 'jotai'
 import { orderBookAtom } from '../state/marketAtoms'
 
+// Live order book view driven by Jotai state.
 export default function OrderBook() {
   const orderBook = useAtomValue(orderBookAtom)
   const bids = [...orderBook.bids].reverse()

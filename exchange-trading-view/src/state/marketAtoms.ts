@@ -1,5 +1,6 @@
 import { atom } from 'jotai'
 
+// Order book snapshots used by orderbook/depth components.
 export type OrderBookLevel = { price: number; amount: number }
 export type OrderBookState = {
   bids: OrderBookLevel[]
@@ -8,6 +9,7 @@ export type OrderBookState = {
   updatedAt: number
 }
 
+// Recent trade tape entries.
 export type Trade = {
   id: string
   price: number
@@ -16,6 +18,7 @@ export type Trade = {
   timestamp: number
 }
 
+// Perpetual position summary (single symbol demo).
 export type Position = {
   symbol: string
   side: 'long' | 'short'
@@ -25,8 +28,10 @@ export type Position = {
   pnl: number
 }
 
+// Last trade tick for K-line synthesis.
 export type Tick = { price: number; timestamp: number }
 
+// WebSocket connection state + per-channel seqs.
 export type ConnectionState = {
   status: 'connecting' | 'connected' | 'reconnecting' | 'disconnected'
   marketSeq: number
@@ -36,6 +41,7 @@ export type ConnectionState = {
   lastDisconnectAt: number
 }
 
+// Shared atoms for market data flow.
 export const orderBookAtom = atom<OrderBookState>({
   bids: [],
   asks: [],
